@@ -87,7 +87,7 @@ if accelerator.is_main_process:
     import wandb
 
     wandb.login(key=os.getenv("WANDB_KEY"))
-    wandb.init(project="HASS-Modified", entity=os.getenv("WANDB_ENTITY"), config=train_config)
+    wandb.init(project=os.getenv("WANDB_PROJECT"), entity=os.getenv("WANDB_ENTITY"), config=train_config)
 
 baseconfig = AutoConfig.from_pretrained(args.basepath)
 
