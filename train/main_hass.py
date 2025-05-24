@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--basepath', type=str, default=os.getenv("BASE_DIR"))
 parser.add_argument('--configpath', type=str, default=os.getenv("CONFIG_DIR"))
 parser.add_argument('--lr', type=float, default=3e-5)
-parser.add_argument('--bs', type=int, default=4)
+parser.add_argument('--bs', type=int, default=1)
 parser.add_argument('--gradient-accumulation-steps', type=int, default=1)
 parser.add_argument('--tmpdir', type=str, default=os.getenv("DATA_DIR"))
 parser.add_argument('--cpdir', type=str, default=os.getenv("CP_DIR"))
@@ -87,7 +87,7 @@ if accelerator.is_main_process:
     import wandb
 
     wandb.login(key=os.getenv("WANDB_KEY"))
-    wandb.init(project="HASS", entity=os.getenv("WANDB_ENTITY"), config=train_config)
+    wandb.init(project="HASS-Modified", entity=os.getenv("WANDB_ENTITY"), config=train_config)
 
 baseconfig = AutoConfig.from_pretrained(args.basepath)
 
@@ -339,7 +339,6 @@ train_loader = DataLoader(traindataset, batch_size=train_config["bs"], shuffle=T
                           pin_memory=True)
 test_loader = DataLoader(testdataset, batch_size=train_config["bs"], shuffle=False,
                          collate_fn=DataCollatorWithPadding(), num_workers=train_config["num_workers"], pin_memory=True)
-
 
 
 

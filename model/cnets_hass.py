@@ -335,7 +335,7 @@ class LlamaAttention(nn.Module):
 
         total_attn_weights = (attn_weights * align_masks).sum(dim=0) # (bsz, head_num, seq_len, seq_len)
         # upcast attention to fp32
-        total_attn_weights = nn.functional.softmax(total_attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
+        total_attn_weights = nn.functional.softmax(total_attn_weights+attention_mask, dim=-1, dtype=torch.float32).to(query_states.dtype)
 
         attn_weights = total_attn_weights[None, ...] * align_masks
         attn_output = torch.matmul(attn_weights, value_states).sum(dim=0)   # (bsz, head_num, seq_len, head_dim)
@@ -689,7 +689,7 @@ class Model(nn.Module):
         self.stable_kv = None
 
     @torch.no_grad()
-    def topK_genrate(self, hidden_states, input_ids, head, logits_processor):
+    def topK_generate(self, hidden_states, input_ids, head, logits_processor):
 
         input_ids = input_ids.to(hidden_states.device)
         total_tokens = self.total_tokens

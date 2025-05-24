@@ -1,5 +1,6 @@
 import argparse
 import copy
+import os
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -7,10 +8,10 @@ parser = argparse.ArgumentParser(description='sp')
 parser.add_argument('--start', type=int, default=0)
 parser.add_argument('--end', type=int, default=100)
 parser.add_argument('--index', type=int, default=1)
-parser.add_argument('--gpu_index', type=int, nargs='+', default=[0])
+parser.add_argument('--gpu_index', type=int, nargs='+', default=[2])
 parser.add_argument('--outdir', type=str, default='outdir0')
-parser.add_argument('--data_path', type=str, default='0')
-parser.add_argument('--model_path', type=str, default='0')
+parser.add_argument('--data_path', type=str, default='/deltadisk/huangjiayi/dataset/eagle/ShareGPT_V3_unfiltered_cleaned_split_no_imsorry.json')
+parser.add_argument('--model_path', type=str, default=os.getenv("BASE_DIR"))
 args = parser.parse_args()
 import os
 
@@ -49,12 +50,8 @@ def build_dataset_rank(
     ds = ds['train']
     ds = ds.shuffle(seed=42)
     ds1 = ds.select(range(args.start, args.end))
-    # ds1 = ds.select(range(100,200))
-    # dst=ds.select(range(200,300))
-    # ds2=ds.select(range(300,len(ds)))
     original_columns1 = ds1.column_names
-    # original_columns2 = ds2.column_names
-    num_proc = 4
+    num_proc = 1
 
     def preprocess_function(examples):
         new_examples = {
@@ -71,7 +68,7 @@ def build_dataset_rank(
                 source= examples['conversations'][i]
                 
                 if roles[source[0]["from"]] != conv.roles[0]:
-                    # Skip the first one if it is not from human
+                    
                     source = source[1:]
                 
                     
@@ -83,10 +80,10 @@ def build_dataset_rank(
                         sentence["value"]=" "+sentence["value"]
                     conv.append_message(role, sentence["value"])
                 conversation=conv.get_prompt()
-                # if i==56:
-                #     print(i)
-                # if i==57:
-                #     print(i)
+                
+                
+                
+                
                 if not tokenizer.pad_token_id:
                     tokenizer.pad_token_id=tokenizer.unk_token_id
 
@@ -97,7 +94,7 @@ def build_dataset_rank(
                     truncation=True,
                 ).input_ids[0]
                 loss_mask=torch.ones_like(input_ids)
-                #print(i)
+                
 
                 sep = conv.sep + conv.roles[1] + " "
                 
@@ -150,13 +147,13 @@ def build_dataset_rank(
         load_from_cache_file=False
     )
 
-    # ds1 = ds1.filter(lambda x: len(x["input_ids"]) < 1024, batched=False)
-    # ds1 = ds1.filter(lambda x: x['queryf'] not in gqs, batched=False)
-    # ds1 = ds1.filter(lambda x: "Are there any tips in regards to teaching" in x['queryf'], batched=False)
+    
+    
+    
 
     ds1.set_format(type="torch")
-    # ds2.set_format(type="torch")
-    # dst.set_format(type="torch")
+    
+    
     return ds1
 
 bigtokenizer = AutoTokenizer.from_pretrained(bigname,use_fast=False)

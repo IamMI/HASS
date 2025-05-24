@@ -1,12 +1,13 @@
 from model.ea_model import EaModel
 from fastchat.model import get_conversation_template
 import torch
+import os
 import warnings
 warnings.filterwarnings("ignore")
 
 
-base_model_path = 'params/llama2'
-EAGLE_model_path = 'params/HASS'
+base_model_path = os.getenv("BASE_DIR")
+EAGLE_model_path = os.getenv("CONFIG_DIR")
 use_llama_2_chat = True
 use_vicuna = False
 
